@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/server/">
+    <Project Path="server/SocialHub.Api/SocialHub.Api.csproj" />
+    <Project Path="server/SocialHub.Core/SocialHub.Core.csproj" />
+    <Project Path="server/SocialHub.Infrastructure/SocialHub.Infrastructure.csproj" />
+    <Project Path="server/SocialHub.Tests/SocialHub.Tests.csproj" />
+  </Folder>
+</Solution>

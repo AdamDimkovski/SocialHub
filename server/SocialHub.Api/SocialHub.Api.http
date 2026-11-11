@@ -1,0 +1,6 @@
+@SocialHub.Api_HostAddress = http://localhost:5228
+
+GET {{SocialHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
