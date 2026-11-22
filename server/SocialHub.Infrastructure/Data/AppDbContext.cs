@@ -1,7 +1,8 @@
-namespace SocialHub.Infrastructure.Data;
-
 using Microsoft.EntityFrameworkCore;
 using SocialHub.Core.Entities;
+using SocialHub.Core.Constants;
+
+namespace SocialHub.Infrastructure.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
@@ -17,8 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 // Table name / Primary Key
                 entity.ToTable("users", tableBuilder =>
                 {
-                    tableBuilder.HasCheckConstraint("CK_username_length", "LENGTH(username) BETWEEN 3 AND 50");
-                    tableBuilder.HasCheckConstraint("CK_email_length", "LENGTH(email) BETWEEN 3 AND 100");
+                    tableBuilder.HasCheckConstraint("CK_username_length", $"LENGTH(username) BETWEEN {UserConstraints.UsernameMinLength} AND {UserConstraints.UsernameMaxLength}");
+                    tableBuilder.HasCheckConstraint("CK_email_length", $"LENGTH(email) BETWEEN {UserConstraints.EmailMinLength} AND {UserConstraints.EmailMaxLength}");
                 }
                 );
 

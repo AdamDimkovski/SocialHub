@@ -1,6 +1,6 @@
 namespace SocialHub.Api.DTOs.Auth;
 
-public record UserResponse(
+public record RegisterUserResponse(
     Guid Id,
     string Username,
     string Email,
