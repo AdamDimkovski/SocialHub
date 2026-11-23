@@ -1,7 +1,6 @@
 using FluentValidation.TestHelper;
 using SocialHub.Api.DTOs.Auth;
 using SocialHub.Api.Validators;
-using Xunit;
 using SocialHub.Core.Constants;
 
 namespace SocialHub.Tests.Validators;

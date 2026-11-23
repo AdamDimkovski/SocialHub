@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialHub.Infrastructure.Data;
+using SocialHub.Infrastructure.Security;
+using SocialHub.Core.Abstractions;
 using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,13 @@ builder.Services.AddControllers();
 
 // Automatically registers all validators in the same assembly as Program
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+builder.Services.AddOptions<PasswordHasherOptions>()
+    .Bind(builder.Configuration.GetSection(PasswordHasherOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
