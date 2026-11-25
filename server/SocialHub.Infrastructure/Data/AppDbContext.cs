@@ -39,7 +39,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                     .HasColumnType("citext");
 
                 entity.HasIndex(u => u.Username)
-                    .IsUnique();
+                    .IsUnique()
+                    .HasDatabaseName(UserConstraints.DatabaseUsername);
+
 
                 // Email
                 entity.Property(u => u.Email)
@@ -48,7 +50,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                     .HasColumnType("citext");
 
                 entity.HasIndex(u => u.Email)
-                    .IsUnique();
+                    .IsUnique()
+                    .HasDatabaseName(UserConstraints.DatabaseEmail);
 
                 // Password
                 entity.Property(u => u.PasswordHash)

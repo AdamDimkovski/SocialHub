@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SocialHub.Infrastructure.Data;
 using SocialHub.Infrastructure.Security;
+using SocialHub.Infrastructure.Services;
 using SocialHub.Core.Abstractions;
 using FluentValidation;
 
@@ -22,6 +23,8 @@ builder.Services.AddOptions<PasswordHasherOptions>()
     .ValidateOnStart();
 
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
+
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
