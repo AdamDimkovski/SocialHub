@@ -3,16 +3,20 @@ using SocialHub.Infrastructure.Data;
 using SocialHub.Infrastructure.Security;
 using SocialHub.Infrastructure.Services;
 using SocialHub.Core.Abstractions;
+using SocialHub.Api.Endpoints;
+using Scalar.AspNetCore;
 using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<RouteHandlerOptions>(options =>
+{
+    options.ThrowOnBadRequest = false;
+});
+
 // Retrieve Default connection string
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Connection string 'Default' not found.");
-
-// Add services to the container.
-builder.Services.AddControllers();
 
 // Automatically registers all validators in the same assembly as Program
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -26,6 +30,8 @@ builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
+builder.Services.AddProblemDetails();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -36,12 +42,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.MapScalarApiReference();
 }
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+// Adds authentication endpoint
+var api = app.MapGroup("/api");
+api.MapAuthEndpoints();
 
 app.Run();

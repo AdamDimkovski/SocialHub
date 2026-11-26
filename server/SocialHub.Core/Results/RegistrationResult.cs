@@ -5,16 +5,18 @@ public enum RegistrationStatus { Success, DuplicateUsername, DuplicateEmail }
 public sealed class RegistrationResult
 {
     public RegistrationStatus Status { get; }
-    public Guid? UserId { get; }
+    public RegisteredUser? User { get; }
     public bool IsSuccess => Status == RegistrationStatus.Success;
 
-    private RegistrationResult(RegistrationStatus status, Guid? userId = null)
+    private RegistrationResult(RegistrationStatus status, RegisteredUser? user = null)
     {
-        UserId = userId;
+        User = user;
         Status = status;
     }
 
-    public static RegistrationResult Success(Guid userId) => new(RegistrationStatus.Success, userId);
+    public static RegistrationResult Success(RegisteredUser userId) => new(RegistrationStatus.Success, userId);
+
     public static RegistrationResult DuplicateUsername() => new(RegistrationStatus.DuplicateUsername);
+
     public static RegistrationResult DuplicateEmail() => new(RegistrationStatus.DuplicateEmail);
 }

@@ -11,11 +11,11 @@ namespace SocialHub.Infrastructure.Services;
 public sealed class RegistrationService : IRegistrationService
 {
     private readonly AppDbContext _db;
-    private readonly IPasswordHasher _passwordhasher;
+    private readonly IPasswordHasher _passwordHasher;
     public RegistrationService(AppDbContext dbContext, IPasswordHasher passwordHasher)
     {
         _db = dbContext;
-        _passwordhasher = passwordHasher;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<RegistrationResult> RegisterAsync(string username, string email, string password)
@@ -37,7 +37,7 @@ public sealed class RegistrationService : IRegistrationService
         {
             Username = normalisedUsername,
             Email = normalisedEmail,
-            PasswordHash = _passwordhasher.Hash(password)
+            PasswordHash = _passwordHasher.Hash(password)
         };
 
         _db.Users.Add(user);
@@ -58,8 +58,10 @@ public sealed class RegistrationService : IRegistrationService
             throw;
         }
 
+        var registeredUser = new RegisteredUser(user.Id, user.Username, user.Email, user.CreatedAt);
+        
         // Returns sucessful only if theres no issues with try catch.
-        return RegistrationResult.Success(user.Id);
+        return RegistrationResult.Success(registeredUser);
 
         
     }
