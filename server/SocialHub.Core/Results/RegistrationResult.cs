@@ -14,7 +14,7 @@ public sealed class RegistrationResult
         Status = status;
     }
 
-    public static RegistrationResult Success(RegisteredUser userId) => new(RegistrationStatus.Success, userId);
+    public static RegistrationResult Success(RegisteredUser registeredUser) => new(RegistrationStatus.Success, registeredUser);
 
     public static RegistrationResult DuplicateUsername() => new(RegistrationStatus.DuplicateUsername);
 

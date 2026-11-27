@@ -1,0 +1,59 @@
+1. Happy Path 
+{ "username": "john_pork", "email": "John@Mail.com", "password": "Password123" }
+201 created: 
+
+2. Same username again, with a different email:
+{ "username": "john_pork", "email": "other@mail.com", "password": "Password123" }
+409 conflict: "Username already taken."
+
+3. Same username with a different username: (proves citext)
+{ "username": "JOHN_PORK", "email": "other@mail.com", "password": "Password123" }
+409 conflict: "Username already taken."
+
+4. Same email, different case, with a new username:
+{ "username": "jane_doe", "email": "JOHN@MAIL.COM", "password": "Password123" }
+409 conflict: "Email already taken."
+
+5. Short username
+{ "username": "ab", "email": "a@mail.com", "password": "Password123" }
+400 bad request: field error
+
+6. Username with a space
+{ "username": "bad name", "email": "a@mail.com", "password": "Password123" }
+400 bad request: field error
+
+7. Username with a invalid email
+{ "username": "valid_user", "email": "not-an-email", "password": "Password123" }
+400 bad request: field error
+
+8. Passwords short length
+{ "username": "valid_user", "email": "a@mail.com", "password": "short1A" }
+400 bad request: field error
+
+9. Passwords no uppercase
+{ "username": "valid_user", "email": "a@mail.com", "password": "alllowercase1" }
+400 bad request: field error
+
+10. Password no digits
+{ "username": "valid_user", "email": "a@mail.com", "password": "NoDigitsHere" }
+400 bad request: field error
+
+11. Ascii rule
+{ "username": "valid_user", "email": "a@mail.com", "password": "Passwörd123" }
+400 bad request: field error
+
+12. Empty fields
+{ "username": "", "email": "", "password": "" }
+400 bad request: field error
+
+13. Empty Body
+{  }
+400 bad request: field error
+
+14. Missing fields
+{ "username": "only_username" }
+400 Bad Request
+
+15. Wrong type
+{ username: john_pork, email: John@Mail.com, password: Password123 }
+400 Bad Request
