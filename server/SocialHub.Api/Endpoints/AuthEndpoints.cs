@@ -12,8 +12,12 @@ public static class AuthEndpoints
         var auth = endpoints.MapGroup("/auth");
 
         auth.MapPost("/register", RegisterAsync)
-            .WithName("Register Account")
-            .WithSummary("Registers a new user.");  
+            .WithName("Register")
+            .WithSummary("Registers a new user.");
+
+        auth.MapPost("/login", LoginAsync)
+            .WithName("Login")
+            .WithSummary("Authenticates a existing user.");
 
         return endpoints;
     }
@@ -24,25 +28,52 @@ public static class AuthEndpoints
     IRegistrationService registrationService)
     {
 
-    // Validation obj, waits for request, checks if valid, returns error in message.
-    var validation = await validator.ValidateAsync(request);
+        // Validation obj, waits for request, checks if valid, returns error in message.
+        var validation = await validator.ValidateAsync(request);
 
-    if(!validation.IsValid) {
-        return Results.ValidationProblem(validation.ToDictionary());
+        if (!validation.IsValid)
+        {
+            return Results.ValidationProblem(validation.ToDictionary());
+        }
+
+        var result = await registrationService.RegisterAsync(
+            request.Username, request.Email, request.Password);
+
+        return result.Status switch
+        {
+            RegistrationStatus.Success => Results.Created($"/api/users/{result.User!.Id}", new RegisterUserResponse(
+                result.User.Id, result.User.Username, result.User.Email, result.User.CreatedAt)),
+            RegistrationStatus.DuplicateUsername => Results.Conflict(new { error = "Username already taken." }),
+            RegistrationStatus.DuplicateEmail => Results.Conflict(new { error = "Email already taken." }),
+            _ => throw new InvalidOperationException($"Unexpected error has occured: {result.Status}")
+
+        };
     }
 
-    var result = await registrationService.RegisterAsync(
-        request.Username, request.Email, request.Password);
-
-    return result.Status switch
+    private static async Task<IResult> LoginAsync(
+        LoginRequest request,
+        IValidator<LoginRequest> validator,
+        ILoginService loginService)
     {
-        RegistrationStatus.Success => Results.Created($"/api/users/{result.User!.Id}", new RegisterUserResponse(
-            result.User.Id, result.User.Username, result.User.Email, result.User.CreatedAt)),
-        RegistrationStatus.DuplicateUsername => Results.Conflict(new { error = "Username already taken."}),
-        RegistrationStatus.DuplicateEmail => Results.Conflict(new { error = "Email already taken."}),
-        _ => throw new InvalidOperationException($"Unexpected error has occured: {result.Status}")
+        // Validation obj, waits for request, checks if valid, returns error in message.
+        var validation = await validator.ValidateAsync(request);
 
-    };
-}
+        if (!validation.IsValid)
+        {
+            return Results.ValidationProblem(validation.ToDictionary());
+        }
+
+        var result = await loginService.LoginAsync(
+            request.Identifier, request.Password);
+
+        return result.Status switch
+        {
+            LoginStatus.Success => Results.Ok(new LoginResponse(result.User!.Id, result.User.Username)),
+            LoginStatus.InvalidCredentials => Results.Problem(statusCode: 401, title: "Invalid credentials."),
+            _ => throw new InvalidOperationException($"Unexpected error has occured: {result.Status}")
+        };
+
+
+    }
 }
 

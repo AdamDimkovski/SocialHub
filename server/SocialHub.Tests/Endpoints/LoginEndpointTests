@@ -1,0 +1,19 @@
+1. Correct Username and Password
+{ "identifier": "john_pork", "password": "Password123" }
+200 ok
+
+2. Correct Email and Password 
+{ "identifier": "johnpork@gmail.com", "password": "Password123" }
+200 ok
+
+3. Correct Identifier with Wrong Password
+{ "identifier": "john_pork", "password": "Password12" }
+401 Invalid Credentials
+
+4. Unknown User
+{ "identifier": "john_pork2", "password": "Password123" }
+401 Invalid Credentials
+
+5. Empty fields
+{ "identifier": "", "password": "" }
+400 Bad Request

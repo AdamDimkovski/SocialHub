@@ -1,47 +1,20 @@
-using Microsoft.EntityFrameworkCore;
-using SocialHub.Infrastructure.Data;
-using SocialHub.Infrastructure.Security;
-using SocialHub.Infrastructure.Services;
-using SocialHub.Core.Abstractions;
+using SocialHub.Infrastructure;
+using SocialHub.Api;
+using SocialHub.Core;
 using SocialHub.Api.Endpoints;
 using Scalar.AspNetCore;
-using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<RouteHandlerOptions>(options =>
-{
-    options.ThrowOnBadRequest = false;
-});
+builder.Services.AddApi();
 
-// Retrieve Default connection string
-var connectionString = builder.Configuration.GetConnectionString("Default")
-    ?? throw new InvalidOperationException("Connection string 'Default' not found.");
+builder.Services.AddInfrastructure(builder.Configuration);
 
-// Automatically registers all validators in the same assembly as Program
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-builder.Services.AddOptions<PasswordHasherOptions>()
-    .Bind(builder.Configuration.GetSection(PasswordHasherOptions.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
-
-builder.Services.AddProblemDetails();
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-// Database connection (DbContext)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddCore();
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,7 +23,6 @@ if (app.Environment.IsDevelopment())
 
     app.MapScalarApiReference();
 }
-app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
